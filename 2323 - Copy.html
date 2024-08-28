@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volleyball Score Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .team { display: inline-block; margin: 20px; }
+        .score { font-size: 2em; }
+        button { font-size: 1.2em; margin-top: 10px; padding: 10px; }
+        input { font-size: 1.2em; margin-top: 10px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Volleyball Score Tracker</h1>
+
+    <div class="team">
+        <input id="teamAName" type="text" value="Team A">
+        <div class="score" id="teamAScore">0</div>
+        <button onclick="increaseScore('A')">Increase <span id="teamANameLabel">Team A</span></button>
+        <button onclick="decreaseScore('A')">Decrease <span id="teamANameLabel">Team A</span></button>
+        <button onclick="serve('A')">Serve <span id="teamANameLabelServe">Team A</span></button>
+        <button onclick="declareGameBall()">Declare Game Ball</button>
+    </div>
+
+    <div class="team">
+        <input id="teamBName" type="text" value="Team B">
+        <div class="score" id="teamBScore">0</div>
+        <button onclick="increaseScore('B')">Increase <span id="teamBNameLabel">Team B</span></button>
+        <button onclick="decreaseScore('B')">Decrease <span id="teamBNameLabel">Team B</span></button>
+        <button onclick="serve('B')">Serve <span id="teamBNameLabelServe">Team B</span></button>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button onclick="resetScores()">Reset Scores</button>
+    </div>
+
+    <script>
+        let teamAScore = 0;
+        let teamBScore = 0;
+        let servingTeam = 'A'; // Default to Team A serving
+
+        // Update team name labels dynamically when the name is changed
+        document.getElementById('teamAName').addEventListener('input', function() {
+            document.getElementById('teamANameLabel').textContent = this.value;
+            document.getElementById('teamANameLabelServe').textContent = this.value;
+        });
+
+        document.getElementById('teamBName').addEventListener('input', function() {
+            document.getElementById('teamBNameLabel').textContent = this.value;
+            document.getElementById('teamBNameLabelServe').textContent = this.value;
+        });
+
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(speech);
+        }
+
+        function increaseScore(team) {
+            if (team === 'A') {
+                teamAScore++;
+                document.getElementById('teamAScore').innerText = teamAScore;
+                announceScore('A');
+            } else {
+                teamBScore++;
+                document.getElementById('teamBScore').innerText = teamBScore;
+                announceScore('B');
+            }
+        }
+
+        function decreaseScore(team) {
+            if (team === 'A' && teamAScore > 0) {
+                teamAScore--;
+                document.getElementById('teamAScore').innerText = teamAScore;
+            } else if (team === 'B' && teamBScore > 0) {
+                teamBScore--;
+                document.getElementById('teamBScore').innerText = teamBScore;
+            }
+        }
+
+        function serve(team) {
+            servingTeam = team;
+            announceScore();
+        }
+
+        function formatScore(score) {
+            return score === 0 ? "Love" : score;
+        }
+
+        function announceScore(scoringTeam = servingTeam) {
+            let formattedTeamAScore = formatScore(teamAScore);
+            let formattedTeamBScore = formatScore(teamBScore);
+
+            // If the scores are equal and non-zero, say "ALL"
+            if (teamAScore === teamBScore && teamAScore !== 0) {
+                speak(`${formattedTeamAScore} All`);
+            } else if (teamAScore === 0 && teamBScore === 0) {
+                speak("Love All");
+            } else if (scoringTeam === 'A') {
+                speak(`${formattedTeamAScore} ${formattedTeamBScore}`);
+            } else {
+                speak(`${formattedTeamBScore} ${formattedTeamAScore}`);
+            }
+
+        }
+
+        function declareGameBall() {
+            speak("Game Ball");
+        }
+
+        function resetScores() {
+            teamAScore = 0;
+            teamBScore = 0;
+            document.getElementById('teamAScore').innerText = teamAScore;
+            document.getElementById('teamBScore').innerText = teamBScore;
+            servingTeam = 'A'; // Reset to Team A serving
+            speak("Scores have been reset.");
+        }
+    </script>
+</body>
+</html>
